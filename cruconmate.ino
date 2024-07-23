@@ -4,6 +4,7 @@
 #include "img/large.h"
 #include "img/battery.h"
 #include "img/gauge.h"
+#include "img/gpsoff.h"
 #include "img/gpson.h"
 #include "img/kmh.h"
 
@@ -42,10 +43,21 @@ void loop() {
       break;
     // Speed Screen
     case 10:
+      while (GPSRaw.available() > 0) {
+        if (gps.encode(GPSRaw.read())) {
+          break;
+        }
+      }
       M5.Lcd.startWrite();
       sprite.fillRect(0, 0, 160, 80, BLACK);
       sprite.pushImage(4, 4, 24, 12, battery);
-      sprite.pushImage(4, 21, 24, 18, gpson);
+      if (gps.location.isValid()) {
+        speed = (int) gps.speed.kmph();
+        sprite.pushImage(4, 21, 24, 18, gpson);
+      } else {
+        speed = 0;
+        sprite.pushImage(4, 21, 24, 18, gpsoff);
+      }
       if (speed >= 100) {
         drawLarge(37, 7, 1);
       }
