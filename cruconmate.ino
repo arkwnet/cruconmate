@@ -41,32 +41,11 @@ void loop() {
         screen = 10;
       }
       break;
-    // Speed Screen
+    // Main Screen + Gauge
     case 10:
-      while (GPSRaw.available() > 0) {
-        if (gps.encode(GPSRaw.read())) {
-          break;
-        }
-      }
-      M5.Lcd.startWrite();
-      sprite.fillRect(0, 0, 160, 80, BLACK);
-      sprite.pushImage(4, 4, 24, 12, battery);
-      if (gps.location.isValid()) {
-        speed = (int) gps.speed.kmph();
-        sprite.pushImage(4, 21, 24, 18, gpson);
-      } else {
-        speed = 0;
-        sprite.pushImage(4, 21, 24, 18, gpsoff);
-      }
-      if (speed >= 100) {
-        drawLarge(37, 7, 1);
-      }
-      if (speed >= 10) {
-        drawLarge(59, 7, speed / 10 % 10);
-      }
-      drawLarge(86, 7, speed % 10);
-      sprite.pushImage(114, 26, 42, 16, kmh);
+      drawSpeed();
       sprite.pushImage(6, 56, 148, 20, gauge);
+      M5.Lcd.startWrite();
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
       break;
@@ -76,6 +55,32 @@ void loop() {
     count = 0;
   }
   delay(1000 / 30);
+}
+
+void drawSpeed() {
+  while (GPSRaw.available() > 0) {
+    if (gps.encode(GPSRaw.read())) {
+      break;
+    }
+  }
+  sprite.fillRect(0, 0, 160, 80, BLACK);
+  sprite.pushImage(4, 4, 24, 12, battery);
+  if (gps.location.isValid()) {
+    speed = (int) gps.speed.kmph();
+    sprite.pushImage(4, 21, 24, 18, gpson);
+  } else {
+    speed = 0;
+    sprite.pushImage(4, 21, 24, 18, gpsoff);
+  }
+  if (speed >= 100) {
+    drawLarge(37, 7, 1);
+  }
+  if (speed >= 10) {
+    drawLarge(59, 7, speed / 10 % 10);
+  }
+  drawLarge(86, 7, speed % 10);
+  sprite.pushImage(114, 26, 42, 16, kmh);
+  return;
 }
 
 void drawLarge(int x, int y, int i) {
