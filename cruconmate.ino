@@ -2,11 +2,13 @@
 #include <TinyGPS++.h>
 #include "img/splash.h"
 #include "img/large.h"
+#include "img/small.h"
 #include "img/battery.h"
 #include "img/gauge.h"
 #include "img/gpsoff.h"
 #include "img/gpson.h"
 #include "img/kmh.h"
+#include "img/tbox.h"
 
 TFT_eSprite sprite(&M5.Lcd);
 HardwareSerial GPSRaw(2);
@@ -50,9 +52,32 @@ void loop() {
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
       if (M5.BtnA.wasPressed()) {
-        screen = 12;
-        speed = target;
+        screen = 11;
         count = -1;
+      }
+      break;
+    // Main Screen + Set Target
+    case 11:
+      drawSpeed();
+      sprite.pushImage(4, 48, 152, 26, tbox);
+      if (target >= 100) {
+        drawSmall(78, 53, 1);
+      }
+      drawSmall(88, 53, target / 10 % 10);
+      drawSmall(98, 53, 0);
+      M5.Lcd.startWrite();
+      sprite.pushSprite(0, 0);
+      M5.Lcd.endWrite();
+      if (M5.BtnA.wasPressed()) {
+        speed = target;
+        screen = 12;
+        count = -1;
+      }
+      if (M5.BtnB.wasPressed()) {
+        target += 10;
+        if (target >= 130) {
+          target = 30;
+        }
       }
       break;
     // Main Screen + Gauge (Demo Mode)
@@ -179,6 +204,45 @@ void drawLarge(int x, int y, int i) {
       break;
   }
   sprite.pushImage(x, y, 26, 34, large);
+  return;
+}
+
+void drawSmall(int x, int y, int i) {
+  unsigned short small[140];
+  int bsize = sizeof(small);
+  switch (i) {
+    case 0:
+      memcpy(small, small0, bsize);
+      break;
+    case 1:
+      memcpy(small, small1, bsize);
+      break;
+    case 2:
+      memcpy(small, small2, bsize);
+      break;
+    case 3:
+      memcpy(small, small3, bsize);
+      break;
+    case 4:
+      memcpy(small, small4, bsize);
+      break;
+    case 5:
+      memcpy(small, small5, bsize);
+      break;
+    case 6:
+      memcpy(small, small6, bsize);
+      break;
+    case 7:
+      memcpy(small, small7, bsize);
+      break;
+    case 8:
+      memcpy(small, small8, bsize);
+      break;
+    case 9:
+      memcpy(small, small9, bsize);
+      break;
+  }
+  sprite.pushImage(x, y, 10, 14, small);
   return;
 }
 
