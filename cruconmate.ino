@@ -20,6 +20,7 @@ int screen = 0;
 int count = 0;
 int speed = 0;
 int target = 60;
+float vbat = 0.0f;
 
 void setup() {
   M5.begin();
@@ -94,6 +95,9 @@ void loop() {
       break;
   }
   count++;
+  if (count == 1) {
+    vbat = M5.Axp.GetBatVoltage();
+  }
   if (count >= 30) {
     if (screen == 12) {
       int rand = random(0, 100);
@@ -128,6 +132,31 @@ void drawSpeed() {
   }
   sprite.fillRect(0, 0, 160, 80, BLACK);
   sprite.pushImage(4, 4, 24, 12, battery);
+  uint16_t batcol = WHITE;
+  if (vbat >= 3.0f) {
+    if (vbat <= 3.4f) {
+      batcol = getColor(255, 23, 68);
+    }
+    sprite.fillRect(8, 6, 1, 8, batcol);
+    if (vbat >= 3.2f) {
+      sprite.fillRect(9, 5, 3, 10, batcol);
+    }
+    if (vbat >= 3.4f) {
+      sprite.fillRect(12, 5, 3, 10, batcol);
+    }
+    if (vbat >= 3.6f) {
+      sprite.fillRect(15, 5, 3, 10, batcol);
+    }
+    if (vbat >= 3.8f) {
+      sprite.fillRect(18, 5, 3, 10, batcol);
+    }
+    if (vbat >= 4.0f) {
+      sprite.fillRect(21, 5, 3, 10, batcol);
+    }
+    if (vbat >= 4.2f) {
+      sprite.fillRect(24, 5, 2, 10, batcol);
+    }
+  }
   if (screen == 10 || screen == 11) {
     if (gps.location.isValid()) {
       speed = (int) gps.speed.kmph();
