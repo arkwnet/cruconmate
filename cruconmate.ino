@@ -3,6 +3,7 @@
 #include "img/splash.h"
 #include "img/large.h"
 #include "img/small.h"
+#include "img/settings.h"
 #include "img/battery.h"
 #include "img/charge.h"
 #include "img/gauge.h"
@@ -15,6 +16,7 @@ TFT_eSprite sprite(&M5.Lcd);
 HardwareSerial GPSRaw(2);
 TinyGPSPlus gps;
 
+const int version[3] = {1, 0, 0};
 const int screenWidth = 160;
 const int screenHeight = 80;
 int screen = 0;
@@ -36,6 +38,11 @@ void setup() {
 
 void loop() {
   M5.update();
+  while (GPSRaw.available() > 0) {
+    if (gps.encode(GPSRaw.read())) {
+      break;
+    }
+  }
   switch (screen) {
     // Splash Screen
     case 0:
@@ -91,7 +98,46 @@ void loop() {
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
       if (M5.BtnA.wasPressed()) {
+        screen = 20;
+        count = -1;
+      }
+      break;
+    // Information Screen (Version)
+    case 20:
+      sprite.fillRect(0, 0, 160, 80, BLACK);
+      sprite.pushImage(0, 0, screenWidth, 16, settings_header_version);
+      sprite.pushImage(0, 16, screenWidth, 2, settings_border);
+      sprite.pushImage(15, 23, 131, 49, settings_version1);
+      drawSmall(92, 57, version[0]);
+      drawSmall(106, 57, version[1]);
+      drawSmall(120, 57, version[2]);
+      M5.Lcd.startWrite();
+      sprite.pushSprite(0, 0);
+      M5.Lcd.endWrite();
+      if (M5.BtnA.wasPressed()) {
         screen = 10;
+        count = -1;
+      }
+      if (M5.BtnB.wasPressed()) {
+        screen = 21;
+        count = -1;
+      }
+      break;
+    // Information Screen (License)
+    case 21:
+      sprite.fillRect(0, 0, 160, 80, BLACK);
+      sprite.pushImage(0, 0, screenWidth, 16, settings_header_version);
+      sprite.pushImage(0, 16, screenWidth, 2, settings_border);
+      sprite.pushImage(4, 24, 152, 50, settings_version2);
+      M5.Lcd.startWrite();
+      sprite.pushSprite(0, 0);
+      M5.Lcd.endWrite();
+      if (M5.BtnA.wasPressed()) {
+        screen = 10;
+        count = -1;
+      }
+      if (M5.BtnB.wasPressed()) {
+        screen = 20;
         count = -1;
       }
       break;
@@ -126,13 +172,6 @@ void loop() {
 }
 
 void drawSpeed() {
-  if (screen == 10 || screen == 11) {
-    while (GPSRaw.available() > 0) {
-      if (gps.encode(GPSRaw.read())) {
-        break;
-      }
-    }
-  }
   sprite.fillRect(0, 0, 160, 80, BLACK);
   if (ibat < 0.0f) {
     sprite.pushImage(4, 4, 24, 12, battery);
