@@ -6,6 +6,7 @@
 #include "img/settings.h"
 #include "img/battery.h"
 #include "img/charge.h"
+#include "img/demo.h"
 #include "img/gauge.h"
 #include "img/gpsoff.h"
 #include "img/gpson.h"
@@ -98,6 +99,7 @@ void loop() {
     case 12:
       drawSpeed();
       drawGauge();
+      sprite.pushImage(3, 21, 28, 18, demo);
       M5.Lcd.startWrite();
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
