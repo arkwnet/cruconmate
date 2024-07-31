@@ -19,6 +19,7 @@ TinyGPSPlus gps;
 const int version[3] = {1, 0, 0};
 const int screenWidth = 160;
 const int screenHeight = 80;
+const int pin = 26;
 int screen = 0;
 int count = 0;
 int speed = 0;
@@ -28,6 +29,8 @@ float ibat = 0.0f;
 
 void setup() {
   M5.begin();
+  pinMode(pin, OUTPUT);
+  digitalWrite(pin, LOW);
   setCpuFrequencyMhz(20);
   M5.Lcd.setRotation(3);
   M5.Lcd.setSwapBytes(true);
@@ -62,6 +65,7 @@ void loop() {
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
       if (M5.BtnA.wasPressed()) {
+        digitalWrite(pin, LOW);
         screen = 11;
         count = -1;
       }
@@ -98,6 +102,7 @@ void loop() {
       sprite.pushSprite(0, 0);
       M5.Lcd.endWrite();
       if (M5.BtnA.wasPressed()) {
+        digitalWrite(pin, LOW);
         screen = 20;
         count = -1;
       }
@@ -146,6 +151,24 @@ void loop() {
   if (count == 1) {
     vbat = M5.Axp.GetBatVoltage();
     ibat = M5.Axp.GetBatCurrent();
+  }
+  if (screen == 10 || screen == 12) {
+    if (count == 1 || count == 11 || count == 21) {
+      if (abs(speed - target) <= 10 && abs(speed - target) >= 4) {
+        digitalWrite(pin, HIGH);
+      }
+    }
+    if (count == 3 || count == 13 || count == 23) {
+      digitalWrite(pin, LOW);
+    }
+    if (count == 6 || count == 16 || count == 26) {
+      if (abs(speed - target) <= 10 && abs(speed - target) >= 7) {
+        digitalWrite(pin, HIGH);
+      }
+    }
+    if (count == 8 || count == 18 || count == 28) {
+      digitalWrite(pin, LOW);
+    }
   }
   if (count >= 30) {
     if (screen == 12) {
